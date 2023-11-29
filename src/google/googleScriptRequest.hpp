@@ -48,7 +48,6 @@ private:
     HTTPClient http;
     const String calendarServer = "script.google.com"; 
 
-    //--------------------------------------------------------------------------------------------------------------------camillemariuschatton@gmail.com
     const String calendarRequest = "google-calendar-adresse"
        
 };
