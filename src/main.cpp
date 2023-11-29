@@ -632,7 +632,6 @@ void showNoInternetManual() {
       display.setCursor(scale::x_resMtp(10, display.width()),  scale::y_resMtp(330, display.height()));
       display.print("");
       display.setCursor(scale::x_resMtp(10, display.width()),  scale::y_resMtp(350, display.height()));
-      display.print("Fauses doch nid klappt: 078 794 02 54");
 
   } while (display.nextPage());
   
