@@ -57,6 +57,7 @@ RTC_DATA_ATTR int day_of_last_update = 0;
 -------------------------------------------------------------------------------------*/
 bool displayCalendar();
 bool displaytasks();
+bool displayDailyTasks();
 void deepSleepTill(int wakeHour);
 void readBattery();
 void drawCentreString(const char *buf, int x, int y);
@@ -79,7 +80,7 @@ void setup()
   Serial.println("Start FW");
 
   // Print wakeup reason
-  print_wakeup_reason();
+  //print_wakeup_reason();
 
   // Initialize e-ink display
   display.init(115200);      // uses standard SPI pins, e.g. SCK(18), MISO(19), MOSI(23), SS(5)
@@ -106,7 +107,7 @@ void setup()
       // readChargingStatus();
 
       // Get Tasks from Google Calendar
-      GSR.HTTPRequest();
+      /*GSR.HTTPRequest();
       if (digitalRead(IO16_SetCalendar)) {
          GSR.sortHTTPRequest(GSR.ID_Calendar1);
       }
@@ -122,20 +123,22 @@ void setup()
         displayCalendar();
       }
       else { 
-        displaytasks();
+        //displaytasks();
         //task tk;
         //tk.draw(display);
       }
       
-      day_of_last_update = timeServer::getTimeStruct().tm_mday;
+      day_of_last_update = timeServer::getTimeStruct().tm_mday;*/
     }
   } else 
   {
     showNoInternetManual();
   }
   // Turn off display before deep sleep
-  display.powerOff();
-  deepSleepTill(HOUR_TO_WAKE);
+  //display.powerOff();
+  //deepSleepTill(HOUR_TO_WAKE);
+  
+  displayDailyTasks();
 }
 
 void drawCentreString(const char *buf, int x, int y)
@@ -438,6 +441,65 @@ void splitStringAtWord(String input, String &part1, String &part2) {
     part1 = input.substring(0, max_length);
     part2 = input.substring(max_length);
   }
+}
+
+
+bool displayDailyTasks() {
+  /*-----------------------------------
+  -- Init E-Paper
+  -----------------------------------*/
+  // Turn off text-wrapping
+  //display.setTextWrap(false);
+  //display.setRotation(calendarOrientation);
+  // Clear the screen with white using full window mode. Not strictly nessecary, but as I selected to use partial window for the content, I decided to do a full refresh first.
+  //display.setFullWindow();
+  //display.firstPage();
+  //do
+  //{
+  //  display.fillScreen(GxEPD_WHITE);
+  //} while (display.nextPage());
+  // Print the content on the screen - I use a partial window refresh for the entire width and height, as I find this makes a clearer picture
+  //display.setPartialWindow(0, 0, display.width(), display.height());
+  
+  /*-----------------------------------
+  -- Draw E-Paper
+  -----------------------------------*/
+  display.firstPage();
+  do
+  {
+    /*-------------------------------------------------------------------------------------
+    -- Kalenderübersicht
+    -------------------------------------------------------------------------------------*/
+    display.setFont(fontTitle);
+    display.setTextColor(GxEPD_BLACK);
+    display.setCursor(7, 42);
+    
+    /*-- Tag und Wochentag--*/
+    display.setFont(fontDescription);
+    display.setTextColor(GxEPD_BLACK);
+    int posx = 62; // 640/5
+    int posy = 20;
+    for (int index=0; index<4; index ++) {
+      String string_wday_mday = String(weekdayNumbersShort[timeServer::getTimeStruct().tm_mday]) + " " + String(timeServer::getTimeStruct().tm_mday+1);
+      drawCentreString(string_wday_mday.c_str(), scale::x_resMtp(posx,display.width()), scale::y_resMtp(posy, display.height())); //640x384
+      if(index<3) {
+        display.fillRect(posx+80, posy, 2, display.height(), GxEPD_BLACK);
+      } 
+        
+      posx += 165;
+      
+    }
+
+    /*-------------------------------------------------------------------------------------
+    -- Taskübersicht
+    -------------------------------------------------------------------------------------*/
+    // Add Line between Tasks
+    //display.fillRect(x, y + scale::y_resMtp(10, display.height()), scale::x_resMtp(640,display.width()), scale::y_resMtp(2, display.height()), GxEPD_BLACK);
+
+
+  } while (display.nextPage());
+
+  return true;
 }
 
 
