@@ -37,8 +37,6 @@ public:
 
 private:
     WiFiManager manager; 
-    const char*  ssid = "ssid";
-    const char* password = "password";
 
     String response;
 
