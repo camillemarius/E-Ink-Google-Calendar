@@ -58,30 +58,40 @@ void googleScriptRequest::sortHTTPRequest(String ID_Calendar)
         switch (count)
         {
         case 0:
+			//------------------------------------------ 8 1 15:30;Bier um vier;
             cutDateIndex = strBuffer.indexOf(" ", 0);
-            calEnt[line].Day = strBuffer.substring(0, cutDateIndex); // Exclude end date and time to avoid clutter - Format is "Wed Feb 10 2020 10:00"
+            calEnt[line].Day = strBuffer.substring(0, cutDateIndex); // Extract day
             Serial.print("Day: ");
             Serial.println(calEnt[line].Day);
-
-            calEnt[line].Month = strBuffer.substring(cutDateIndex);
-            Serial.print("Mont: ");
+			
+			//------------------------------------------ 1 15:30;Bier um vier;
+			strBuffer = strBuffer.substring(cutDateIndex + 1);
+            cutDateIndex = strBuffer.indexOf(" ", 0);
+            calEnt[line].Month = strBuffer.substring(0, cutDateIndex); // Extract month
+            Serial.print("Month: ");
             Serial.println(calEnt[line].Month);
+			
+			//------------------------------------------ 15:30;Bier um vier;
+			strBuffer = strBuffer.substring(cutDateIndex+1);
+            cutDateIndex = strBuffer.indexOf(";", 0);
+            calEnt[line].Time = strBuffer.substring(0, cutDateIndex); // Extract time
+            Serial.print("Time: ");
+            Serial.println(calEnt[line].Time);
+
             count = 1;
+			
             break;
 
         case 1: //Filter
+		
+			//------------------------------------------ Bier um vier;
+			strBuffer = strBuffer.substring(cutDateIndex+1);
+			
             // shorten Young Boys to YB
             stringFilter::YoungBoys_to_YB(strBuffer);
-            //if (strBuffer.indexOf("BSC Young Boys") || "BSC Young Boys -")
-            //{
-            //    strBuffer.replace("BSC Young Boys", "YB");
-            //}
 
             // Umlaute
             stringFilter::umlauts(strBuffer);
-            //strBuffer.replace("ä", "ae");
-            //strBuffer.replace("ö", "oe");
-            //strBuffer.replace("ü", "ue");
 
             // Save Event
             calEnt[line].Task = strBuffer;
@@ -99,28 +109,12 @@ void googleScriptRequest::sortHTTPRequest(String ID_Calendar)
 }
 
 bool googleScriptRequest::connectToWifi(void) {
-    //WiFi.setHostname("WG-Kalender");
-    //WiFi.begin(ssid, password);
-    //for(int connection_cnt=0;  connection_cnt<15; connection_cnt++) {
-    //    if(WiFi.status() != WL_CONNECTED) {
-    //        delay(500);
-    //        Serial.print(".");
-    //    } else {
-    //        return true;
-    //    }
-    //}
-    //return false;
-
-    
-    //manager.setConfigPortalBlocking(false);
     manager.setConfigPortalTimeout(3*60);
     if(manager.autoConnect("E-Paper-Calendar")) {
         return true;
     }
     Serial.println("There is no Wifi Connection, not even afer 3 Min Timeout");
     return false;
-
-
 }
 
 bool googleScriptRequest::waitForInternetConnection(int wait_s) {
@@ -153,6 +147,14 @@ String googleScriptRequest::getTask(int index) {
     }
     return "Out of Bound";
 }
+
+String googleScriptRequest::getTime(int index){
+    if(index<calEntryCount) {
+        return calEnt[index].Time;
+    }
+    return "Out of Bound";
+}
+
 
 String googleScriptRequest::getDay(int index){
     if(index<calEntryCount) {
