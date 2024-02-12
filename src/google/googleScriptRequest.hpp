@@ -39,8 +39,8 @@ public:
 
 private:
     WiFiManager manager; 
-    const char*  ssid = "Salt_2GHz_159505";
-    const char* password = "MuUY33L6SERtXG4CDT";
+    const char*  ssid = "ssid";
+    const char* password = "password";
 
     String response;
 
@@ -50,13 +50,6 @@ private:
     HTTPClient http;
     const String calendarServer = "script.google.com"; 
 
-    //--------------------------------------------------------------------------------------------------------------------camillemariuschatton@gmail.com
-    //const String calendarRequest = "https://script.google.com/macros/s/AKfycbyPqiILIhmpg_CP27xqAg-FXjKxnxgSB8ZtHV4Kh79C-BmsPccdP1XgMW1sXyzT3O3vdQ/exec";
-
-    //--------------------------------------------------------------------------------------------------------------------Anna-Sophia
-    //const String calendarRequest = "https://script.google.com/macros/s/AKfycbzs_3rQ9VJhPYhufw4Usoo2A7UgIbgqua-nDLkX7KQ3LO18g4160ThGnMdKXWywPL59og/exec";
-
-    //--------------------------------------------------------------------------------------------------------------------jaya.hilfiker@gmail.com
-    const String calendarRequest = "https://script.google.com/macros/s/AKfycby9f1XumMVQ46J7E3w6Cv5OaVysEP9NyyRTKoTpEqzPBotikvPOqz9Q51ZtRgvs7qJPOA/exec";
+    const String calendarRequest = "";
 };
 #endif
