@@ -387,35 +387,36 @@ bool displayCalendar() {
 			}
 			
 			// Heutiges oder Mehrtägiges Event markieren
-		if((GSR.getTime(i) != "") && (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())){
-				if (GSR.getTime(i) != "00:00") {
+		if(GSR.getTime(i) != "") {
+				if ((GSR.getTime(i) != "00:00") && (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())) {
 					//Event with specific Time
 					display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
 					display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
 					display.setFont(fontSmallDescription);
 					display.setTextColor(GxEPD_WHITE);
 					display.print(formatTime(GSR.getTime(i)));
-				} else { 
-					//Event with no specific Time
-					//Ganztägiges Event
-					if (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())
-					{
-						display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
-						display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
-						display.setFont(fontSmallDescription);
-						display.setTextColor(GxEPD_WHITE);
-						display.print("Gztg.");
-					}
-					//Mehrtägiges Event
-					else if ((timeServer::getTimeStruct().tm_mday > (GSR.getDay(i)).toInt()) || (timeServer::getTimeStruct().tm_mon > (GSR.getMonth(i)).toInt()))
-					{
-						display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
-						display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
-						display.setFont(fontSmallDescription);
-						display.setTextColor(GxEPD_WHITE);
-						display.print("Mhrt.");
-					}
 				}
+        else { 
+          //Event with no specific Time
+          //Ganztägiges Event
+          if (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())
+          {
+            display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
+            display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
+            display.setFont(fontSmallDescription);
+            display.setTextColor(GxEPD_WHITE);
+            display.print("Gztg.");
+          }
+          //Mehrtägiges Event
+          else if ((timeServer::getTimeStruct().tm_mday > (GSR.getDay(i)).toInt()) || (timeServer::getTimeStruct().tm_mon > (GSR.getMonth(i)).toInt()))
+          {
+            display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
+            display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
+            display.setFont(fontSmallDescription);
+            display.setTextColor(GxEPD_WHITE);
+            display.print("Mhrt.");
+          }
+        }
 			}
 			  
 			// Add Line between Tasks
@@ -485,37 +486,40 @@ bool displaytasks() {
     /*-------------------------------------------------------------------------------------
     -- Taskübersicht
     -------------------------------------------------------------------------------------*/
-	int x = 7; int y = 100;
+	  int x = 7; int y = 100;
     for (int i = 0; i < GSR.getEntryCount(); i++) {	
-		/*-- Print Task Title --*/ 
-		String task_description = GSR.getTask(i);
-		if(task_description != "") {
-			String sub_str1, sub_str2, sub_str3, sub_str4, sub_str5;
-			splitStringAtWord(task_description, sub_str1, sub_str2, sub_str3, sub_str4;, sub_str5);
-			Serial.println("Part 1: " + sub_str1);
-			Serial.println("Part 2: " + sub_str2);
-			Serial.println("Part 3: " + sub_str3);
-			Serial.println("Part 4: " + sub_str4);
-			Serial.println("Part 5: " + sub_str5);
+      /*-- Print Task Title --*/ 
+      String task_description = GSR.getTask(i);
+      if(task_description != "") {
+        display.setCursor(x, y);
+        display.setTextColor(GxEPD_BLACK);
+        display.setFont(fontDescription);
 
-			display.setCursor(x, y);
-			display.setTextColor(GxEPD_BLACK);
-			display.setFont(fontDescription);
-			if(sub_str2 != "") {
-        for(int i=0; i<5; i++) {
-          if(sub_str2)
+        int max_length = 50;
+        int index = 0;
+        while (index < task_description.length()) {
+          if(index != 0) { // more than one column
+              y = y + scale::y_resMtp(25, display.height());
+              display.setCursor(x, y);
+            }
+            int endIndex = showMin(index + max_length, (int) task_description.length()); // end index for substring
+            Serial.print("endIndex: ");
+            Serial.println(endIndex);
+            int lastSpaceIndex = task_description.lastIndexOf(' ', endIndex); // find last space within substring
+            Serial.print("lastSpaceIndex: ");
+            Serial.println(lastSpaceIndex);
+            if (lastSpaceIndex == -1 || lastSpaceIndex == index) {
+                lastSpaceIndex = endIndex; // no space found or first character is space
+            }
+            String cut_string = task_description.substring(index, lastSpaceIndex);
+            Serial.print("cut_string: ");
+            Serial.println(cut_string);
+            display.print(cut_string);
+            // Druck langer Aufgabentitel
+            
+            index = lastSpaceIndex + 1; // move index to the next word
         }
-				// Print long Task Title
-				display.print(sub_str1);
-				y = y + scale::y_resMtp(25, display.height());
-				display.setCursor(x, y);
-				display.print(sub_str2);
-			} else {
-				// Print short Task Title
-				display.print(GSR.getTask(i));
-			}
-		}
-      
+    }
 		/*-- Print Task Date --*/ 
 		if(GSR.getDay(i) != "") {
 		  display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(15, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_BLACK);
@@ -526,37 +530,38 @@ bool displaytasks() {
 		  display.print(TaskDate);
 		}
 		
-		// Heutiges oder Mehrtägiges Event markieren
-		if((GSR.getTime(i) != "") && (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())){
-			if (GSR.getTime(i) != "00:00") {
-				//Event with specific Time
-				display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
-				display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
-				display.setFont(fontSmallDescription);
-				display.setTextColor(GxEPD_WHITE);
-				display.print(formatTime(GSR.getTime(i)));
-			} else { 
-				//Event with no specific Time
-				//Ganztägiges Event
-				if (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())
-				{
+			// Heutiges oder Mehrtägiges Event markieren
+		if(GSR.getTime(i) != "") {
+				if ((GSR.getTime(i) != "00:00") && (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())) {
+					//Event with specific Time
 					display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
 					display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
 					display.setFont(fontSmallDescription);
 					display.setTextColor(GxEPD_WHITE);
-					display.print("Gztg.");
+					display.print(formatTime(GSR.getTime(i)));
 				}
-				//Mehrtägiges Event
-				else if((timeServer::getTimeStruct().tm_mday > (GSR.getDay(i)).toInt()) || (timeServer::getTimeStruct().tm_mon > (GSR.getMonth(i)).toInt()))
-				{
-					display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
-					display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
-					display.setFont(fontSmallDescription);
-					display.setTextColor(GxEPD_WHITE);
-					display.print("Mhrt.");
-				}
+        else { 
+          //Event with no specific Time
+          //Ganztägiges Event
+          if (timeServer::getTimeStruct().tm_mday == (GSR.getDay(i)).toInt())
+          {
+            display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
+            display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
+            display.setFont(fontSmallDescription);
+            display.setTextColor(GxEPD_WHITE);
+            display.print("Gztg.");
+          }
+          //Mehrtägiges Event
+          else if ((timeServer::getTimeStruct().tm_mday > (GSR.getDay(i)).toInt()) || (timeServer::getTimeStruct().tm_mon > (GSR.getMonth(i)).toInt()))
+          {
+            display.fillRect(scale::x_resMtp(570, display.width()), y - scale::y_resMtp(35, display.height()), scale::x_resMtp(70, display.width()), scale::y_resMtp(25, display.height()), GxEPD_RED);
+            display.setCursor(scale::x_resMtp(580, display.width()), y - scale::y_resMtp(15, display.height()));
+            display.setFont(fontSmallDescription);
+            display.setTextColor(GxEPD_WHITE);
+            display.print("Mhrt.");
+          }
+        }
 			}
-		}
 	  
 		// Add Line between Tasks
 		display.fillRect(x, y + scale::y_resMtp(10, display.height()), scale::x_resMtp(640,display.width()), scale::y_resMtp(2, display.height()), GxEPD_BLACK);
